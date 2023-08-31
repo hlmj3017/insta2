@@ -46,4 +46,28 @@ def login(request):
 
 
 def profile(request, username):
-    pass
+    User = get_user_model()
+
+    user_info = User.objects.get(username=username)
+
+    context ={
+        'user_info' : user_info,
+    }
+
+    return render(request, 'accounts/profile.html', context)
+
+
+@login_required
+def follow(request, username):
+    User = get_user_model()
+
+    me = request.user
+    you = User.objects.get(username=username)
+
+    if you in me.followings.all():
+        me.followings.remove(you)
+
+    else:
+        me.followings.add(you)
+
+    return redirect('accounts:profile', username=username)
